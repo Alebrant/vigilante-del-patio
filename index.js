@@ -54,6 +54,8 @@ tmiClient.on('message', (chann, tags, message, self) => {
         if(!zascaVerbose && !zascaHabilitado){
             console.log(`${tags['display-name']} dice: "${message}"`)
         }
+    } else if(message=="!echo"){
+        tmiClient.say(chann, "echooo");
     } else {
         console.log(`${tags['display-name']} dice: "${message}"`)
     }
