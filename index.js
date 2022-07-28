@@ -36,7 +36,6 @@ tmiClient.on('message', (chann, tags, message, self) => {
     if(matches){
         let mozunidad = Math.random(),
             mozo = tags.username;
-        tmiClient.say(chann, `match: ${mozunidad} @${mozo}`);
         if(mozunidad<1/3){
             if(zascaVerbose){
                 tmiClient.say(chann, `Oh nooooo @${mozo} ha bajado de boca y se nos ha lesionado, tira para la enfermeria un rato`);
@@ -56,13 +55,11 @@ tmiClient.on('message', (chann, tags, message, self) => {
             }
         }
         if(!zascaVerbose && !timeout){
-            tmiClient.say(chann, "match");
             console.log(`${tags['display-name']} dice: "${message}"`)
         }
     } else if(message=="!echo"){
         tmiClient.say(chann, "echooo");
     } else if(tags['display-name'] != process.env.ADMIN_USER){
-        tmiClient.say(chann, "no-match");
         console.log(`${tags['display-name']} dice: "${message}"`)
     }
 });
