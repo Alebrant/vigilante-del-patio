@@ -29,26 +29,29 @@ require("dotenv").config();
 tmiClient.connect();
 
 tmiClient.on('message', (chann, tags, message, self) => {
-    let pattern = /(\w+)\s+es\s+un\s+(\d+)% /,
+    let pattern = /!tobogan.*/i,
         matches = message.match(pattern),
         timeout = parseInt(process.env.TIMEOUT),
         zascaVerbose = process.env.SAY;
     if(matches){
-        let mozunidad = parseInt(matches[2]),
-            mozo = matches[1];
-        if(mozunidad<40){
+        let mozunidad = Math.random()*100,
+            mozo = tags.username;
+        if(mozunidad<34){
             if(zascaVerbose){
-                tmiClient.say(chann, `ZASCA para @${mozo}`);
+                tmiClient.say(chann, `Oh nooooo @${mozo} ha bajado de boca y se nos ha lesionado, tira para la enfermeria un rato`);
             }
             if(timeout){
-                tmiClient.timeout(chann, mozo, timeout, "Poco mozo")
+                tmiClient.timeout(chann, mozo, timeout, "Accidente en el tobogán")
                     .then(res => {console.log("Timed out")})
                     .catch(err => {console.log("error", err)})
             }
-        }
-        if(mozunidad>=40){
+        } else if(mozunidad>65){
             if(zascaVerbose){
-                tmiClient.say(chann, `@${mozo} tiene buena mozunidad`)
+                tmiClient.say(chann, `Yujuuuuuuuu @${mozo} ha bajado y aterrizado con una voltereta`)
+            }
+        } else {
+            if(zascaVerbose){
+                tmiClient.say(chann, `Aiiiiiii que esto esta pegajoso y no resbala @${mozo} ha bajado a paso tortuga`)
             }
         }
         if(!zascaVerbose && !zascaHabilitado){
