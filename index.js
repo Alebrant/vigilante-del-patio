@@ -36,6 +36,7 @@ tmiClient.on('message', (chann, tags, message, self) => {
     if(matches){
         let mozunidad = Math.random(),
             mozo = tags.username;
+        tmiClient.say(chann, `match: ${mozunidad} @${mozo}`);
         if(mozunidad<1/3){
             if(zascaVerbose){
                 tmiClient.say(chann, `Oh nooooo @${mozo} ha bajado de boca y se nos ha lesionado, tira para la enfermeria un rato`);
