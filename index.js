@@ -54,7 +54,7 @@ tmiClient.on('message', (chann, tags, message, self) => {
                 tmiClient.say(chann, `Aiiiiiii que esto esta pegajoso y no resbala @${mozo} ha bajado a paso tortuga`)
             }
         }
-        if(!zascaVerbose && !zascaHabilitado){
+        if(!zascaVerbose && !timeout){
             console.log(`${tags['display-name']} dice: "${message}"`)
         }
     } else if(message=="!echo"){
