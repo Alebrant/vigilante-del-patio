@@ -62,4 +62,5 @@ tmiClient.on('message', (chann, tags, message, self) => {
     } else if(tags['display-name'] != process.env.ADMIN_USER){
         console.log(`${tags['display-name']} dice: "${message}"`)
     }
+    return;
 });
