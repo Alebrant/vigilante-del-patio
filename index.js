@@ -34,9 +34,9 @@ tmiClient.on('message', (chann, tags, message, self) => {
         timeout = parseInt(process.env.TIMEOUT),
         zascaVerbose = process.env.SAY;
     if(matches){
-        let mozunidad = Math.random()*100,
+        let mozunidad = Math.random(),
             mozo = tags.username;
-        if(mozunidad<34){
+        if(mozunidad<1/3){
             if(zascaVerbose){
                 tmiClient.say(chann, `Oh nooooo @${mozo} ha bajado de boca y se nos ha lesionado, tira para la enfermeria un rato`);
             }
@@ -45,7 +45,7 @@ tmiClient.on('message', (chann, tags, message, self) => {
                     .then(res => {console.log("Timed out")})
                     .catch(err => {console.log("error", err)})
             }
-        } else if(mozunidad>65){
+        } else if(mozunidad>=2/3){
             if(zascaVerbose){
                 tmiClient.say(chann, `Yujuuuuuuuu @${mozo} ha bajado y aterrizado con una voltereta`)
             }
@@ -60,7 +60,7 @@ tmiClient.on('message', (chann, tags, message, self) => {
         }
     } else if(message=="!echo"){
         tmiClient.say(chann, "echooo");
-    } else {
+    } else if(tags['display-name'] != process.env.ADMIN_USER){
         tmiClient.say(chann, "no-match");
         console.log(`${tags['display-name']} dice: "${message}"`)
     }
