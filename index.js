@@ -55,11 +55,13 @@ tmiClient.on('message', (chann, tags, message, self) => {
             }
         }
         if(!zascaVerbose && !timeout){
-            console.log(tags)
+            tmiClient.say(chann, "match");
+            console.log(`${tags['display-name']} dice: "${message}"`)
         }
     } else if(message=="!echo"){
         tmiClient.say(chann, "echooo");
     } else {
+        tmiClient.say(chann, "no-match");
         console.log(`${tags['display-name']} dice: "${message}"`)
     }
 });
