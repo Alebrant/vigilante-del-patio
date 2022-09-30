@@ -75,6 +75,7 @@ profeDelPatio.on('message', (chann, tags, message, self) => {
             profeDelPatio.say(chann, mensaje);
         }
         columpio.ocupadoPor = mozo;
+        profeDelPatio.say(chann, `@${mozo} se sube al columpio. Wiiii`);
     } else if(message=="!echo"){
         profeDelPatio.say(chann, "echooo");
     } else if(tags['display-name'] != process.env.ADMIN_USER){
