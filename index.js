@@ -9,13 +9,17 @@
   * App Variables
   */
 require("dotenv").config();
-const tmiClient = new tmi.Client({
+const profeDelPatio = new tmi.Client({
     channels: [process.env.CHANNEL],
     identity:{
         username: process.env.ADMIN_USER,
         password: process.env.ADMIN_TOKEN
     }
 });
+let columpio = {
+    ocupadoPor: null,
+    timeout: null
+};
   
  /**
   *  App Configuration
@@ -26,39 +30,53 @@ require("dotenv").config();
  * Chat listener initiation
  */
 
-tmiClient.connect();
-
-tmiClient.on('message', (chann, tags, message, self) => {
-    let pattern = /!tobogan.*/i,
-        matches = message.match(pattern),
-        timeout = parseInt(process.env.TIMEOUT),
-        zascaVerbose = process.env.SAY;
-    if(matches){
-        let mozunidad = Math.random(),
-            mozo = tags.username;
+profeDelPatio.connect();
+profeDelPatio.on('message', (chann, tags, message, self) => {
+    let toboganPattern = /!tobogan.*/i,
+        toboganMatches = message.match(toboganPattern),
+        columpioPattern = /!columpio.*/i,
+        columpioMatches = message.match(columpioPattern),
+        timeoutTobogan = parseInt(process.env.TIMEOUT),
+        timeoutColumpio = parseInt(15),
+        zascaVerbose = process.env.SAY,
+        mozo = tags.username;
+    if(toboganMatches){
+        let mozunidad = Math.random();
         if(mozunidad<1/3){
             if(zascaVerbose){
-                tmiClient.say(chann, `Oh nooooo @${mozo} ha bajado de boca y se nos ha lesionado, tira para la enfermeria un rato`);
+                profeDelPatio.say(chann, `Oh nooooo @${mozo} ha bajado de boca y se nos ha lesionado, tira para la enfermeria un rato`);
             }
-            if(timeout){
-                tmiClient.timeout(chann, mozo, timeout, "Accidente en el tobogán")
+            if(timeoutTobogan){
+                profeDelPatio.timeout(chann, mozo, timeoutTobogan, "Accidente en el tobogán")
                     .then(res => {console.log("Timed out")})
                     .catch(err => {console.log("error", err)})
             }
         } else if(mozunidad>=2/3){
             if(zascaVerbose){
-                tmiClient.say(chann, `Yujuuuuuuuu @${mozo} ha bajado y aterrizado con una voltereta`)
+                profeDelPatio.say(chann, `Yujuuuuuuuu @${mozo} ha bajado y aterrizado con una voltereta`)
             }
         } else {
             if(zascaVerbose){
-                tmiClient.say(chann, `Aiiiiiii que esto esta pegajoso y no resbala @${mozo} ha bajado a paso tortuga`)
+                profeDelPatio.say(chann, `Aiiiiiii que esto esta pegajoso y no resbala @${mozo} ha bajado a paso tortuga`)
             }
         }
-        if(!zascaVerbose && !timeout){
+        if(!zascaVerbose && !timeoutTobogan){
             console.log(`${tags['display-name']} dice: "${message}"`)
         }
+    } else if(columpioMatches){
+        if(columpio.ocupadoPor){
+            let mensaje = `@${mozo} tira a @${columpio.ocupadoPor} del columpio para subirse.`;
+            if(timeoutColumpio){
+                mensaje = `${mensaje} @${columpio.ocupadoPor} se ha espiñado. Toca viaje a la enfermería.`;
+                profeDelPatio.timeout(chann, mozo, timeoutTobogan, "Accidente en el columpio")
+                    .then(res => {console.log("Timed out")})
+                    .catch(err => {console.log("error", err)})
+            }
+            profeDelPatio.say(chann, mensaje);
+        }
+        columpio.ocupadoPor = mozo;
     } else if(message=="!echo"){
-        tmiClient.say(chann, "echooo");
+        profeDelPatio.say(chann, "echooo");
     } else if(tags['display-name'] != process.env.ADMIN_USER){
         console.log(`${tags['display-name']} dice: "${message}"`)
     }
