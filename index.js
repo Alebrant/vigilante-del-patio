@@ -18,6 +18,7 @@ const profeDelPatio = new tmi.Client({
 });
 let columpio = {
     ocupadoPor: null,
+    desde: null,
     timeout: null
 };
   
@@ -64,17 +65,21 @@ profeDelPatio.on('message', (chann, tags, message, self) => {
             console.log(`${tags['display-name']} dice: "${message}"`)
         }
     } else if(columpioMatches){
+        if(mozo == columpio.ocupadoPor){
+            return profeDelPatio.say(chann, `@${mozo} Lleva un rato montado en el columpio.`);
+        }
         if(columpio.ocupadoPor){
             let mensaje = `@${mozo} tira a @${columpio.ocupadoPor} del columpio para subirse.`;
             if(timeoutColumpio){
                 mensaje = `${mensaje} @${columpio.ocupadoPor} se ha espiñado. Toca viaje a la enfermería.`;
-                profeDelPatio.timeout(chann, mozo, timeoutTobogan, "Accidente en el columpio")
+                profeDelPatio.timeout(chann, columpio.ocupadoPor, timeoutColumpio, "Accidente en el columpio")
                     .then(res => {console.log("Timed out")})
                     .catch(err => {console.log("error", err)})
             }
             profeDelPatio.say(chann, mensaje);
         }
         columpio.ocupadoPor = mozo;
+        columpio.desde = newDate();
         profeDelPatio.say(chann, `@${mozo} se sube al columpio. Wiiii`);
     } else if(message=="!echo"){
         profeDelPatio.say(chann, "echooo");
