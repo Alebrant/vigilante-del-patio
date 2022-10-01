@@ -79,7 +79,7 @@ profeDelPatio.on('message', (chann, tags, message, self) => {
             profeDelPatio.say(chann, mensaje);
         }
         columpio.ocupadoPor = mozo;
-        columpio.desde = newDate();
+        columpio.desde = new Date();
         profeDelPatio.say(chann, `@${mozo} se sube al columpio. Wiiii`);
     } else if(message=="!echo"){
         profeDelPatio.say(chann, "echooo");
