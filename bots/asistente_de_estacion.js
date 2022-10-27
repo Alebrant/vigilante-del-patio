@@ -23,6 +23,7 @@ const tna = new tmi.Client({
         password: process.env.TOKEN3
     }
 });
+let token = process.env.ALEB_TOKEN;
 let datosRecompensas = {
     broadcaster_id: null,
     recompensas: null
@@ -42,8 +43,10 @@ tna.connect();
 adee.on('message', (chann, tags, message, self) => {
     let oniPattern = /!oni.*/i,
         oniMatches = message.match(oniPattern),
-        hkPattern = /!hk.*/i,
+        hkPattern = /!hk(\s(\w+))*/,
         hkMatches = message.match(hkPattern),
+        codePattern = /!code(\s(\w+))*/,
+        codeMatches = message.match(codePattern),
         recompensasComunes = ['Proponer recompensa'],
         hablante = tags.username;
     if(oniMatches){
@@ -58,8 +61,9 @@ adee.on('message', (chann, tags, message, self) => {
                 updateReward(id, activa);
             }
         });
+        startGame("oni");
     } else if(hkMatches){
-        let recompensasHK = ['¡Cuenta conmigo!_dup'],
+        let recompensasHK = [],
             bgColor = "#646464",
             recompensasActivas = recompensasComunes.concat(recompensasHK);
         datosRecompensas.recompensas.forEach(recompensa => {
@@ -70,12 +74,22 @@ adee.on('message', (chann, tags, message, self) => {
                 updateReward(id, activa);
             }
         });
+        startGame("hk");
     } else if(message=="!auth"){
         authorize();
-    } else if(message=="!token"){
-        getToken();
+    } else if(codeMatches){
+        let code = codeMatches[2];
+        getToken(code);
     } else if(message=="!reinit"){
         initRecompensas();
+    } else if(message=="!channel"){
+        const urlChannel = "https://api.twitch.tv/helix/channels",
+            broadcaster_id = "429191960",
+            url = `${urlChannel}?broadcaster_id=${broadcaster_id}`;
+        axios.get(url)
+        .then(response => {
+            console.log(response.data);
+        })
     } else if(message=="!echo"){
         setTimeout(function(){
             tna.say(chann, "echooo");
@@ -89,24 +103,24 @@ function authorize(){
     let urlAuthorize = "https://id.twitch.tv/oauth2/authorize",
         redirect = encodeURIComponent(process.env.ALEB_REDIRECT_URL),
         response_type = 'code',
-        scopesArr = ['channel:manage:redemptions'],
-        scope = encodeURIComponent(scopesArr.join('+')),
+        scopesArr = ['channel:manage:redemptions', 'channel:manage:broadcast'],
+        scope = encodeURIComponent(scopesArr.join(' ')),
         url = `${urlAuthorize}?client_id=${process.env.ALEB_CLIENT}&redirect_uri=${redirect}`
             + `&response_type=${response_type}&scope=${scope}`;
     console.log(url);
 }
 
-function getToken(){
+function getToken(newCode){
     let urlToken = "https://id.twitch.tv/oauth2/token",
         redirect = process.env.ALEB_REDIRECT_URL,
+        code = newCode || process.env.ALEB_CODE,
         data = {
             client_id: process.env.ALEB_CLIENT,
             client_secret: process.env.ALEB_SECRET,
-            code: process.env.ALEB_CODE,
+            code: code,
             grant_type: 'authorization_code',
             redirect_uri: redirect
         };
-        token = process.env.ALEB_TOKEN;
     console.log("data", data);
     axios.post(urlToken, data)
     .then(response => {
@@ -117,7 +131,7 @@ function getToken(){
     })
 }
 function initRecompensas(){
-    axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.ALEB_TOKEN}`;
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     axios.defaults.headers.common['Client-Id'] = process.env.ALEB_CLIENT;
     const urlUsuarios = 'https://api.twitch.tv/helix/users',
         urlRewards = 'https://api.twitch.tv/helix/channel_points/custom_rewards';
@@ -127,6 +141,7 @@ function initRecompensas(){
     }).then(user => {
         datosRecompensas.broadcaster_id = user.id; 
         let url = `${urlRewards}?broadcaster_id=${user.id}`;
+        console.log(url);
         return axios.get(url);
     }).then(rewardsResponse => {
         let recompensas = rewardsResponse.data.data;
@@ -142,19 +157,19 @@ function updateReward(id, activate){
         data = {
             is_enabled: !!activate
         };
-    console.log("Actualizar", id, activate);
+    // console.log("Actualizar", id, activate);
 
     axios.patch(url, data)
     .then(response => {
         let nuevaRecompensa = response.data.data[0];
-        console.log(response.data);
+        // console.log(response.data);
         datosRecompensas.recompensas.forEach(recompensa => {
             if(nuevaRecompensa.id == recompensa.id){
                 recompensa.is_enabled = nuevaRecompensa.is_enabled;
             }
         });
     }).catch(e => {
-        console.log("error", e.response);
+        // console.log("error", e.response);
     });
 }
 function duplicarRecompensa(recompensa){
@@ -174,6 +189,36 @@ function crearRecompensa(recompensa){
     axios.post(url, recompensa)
     .then(response => {
         console.log("respuesta creacion:", recompensa, response.data);
+    }).catch(e => {
+        console.log("error", e.response);
+    });
+
+}
+
+function startGame(game){
+    let game_id = "0",
+        title = "Haciendo cosas";
+    switch(game){
+        case "oni":
+            game_id = "493815";
+            title = "[100% Logros] | ONI | !logrosoni"
+            break
+        case "hk":
+            game_id = "490147";
+            title = "[No-hit : PBX] | HK | !run"
+            break;
+    }
+    const urlChannel = 'https://api.twitch.tv/helix/channels',
+        url = `${urlChannel}?broadcaster_id=${datosRecompensas.broadcaster_id}`,
+        data = {
+            game_id: game_id,
+            title: title
+        };
+    console.log("Actualizar canal", data);
+    
+    axios.patch(url, data)
+    .then(response => {
+        console.log("Canal actualizado", response.data.data);
     }).catch(e => {
         console.log("error", e.response);
     });
