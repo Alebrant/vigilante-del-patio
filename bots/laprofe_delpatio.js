@@ -38,7 +38,7 @@ profeDelPatio.on('message', (chann, tags, message, self) => {
         columpioPattern = /!columpio.*/i,
         columpioMatches = message.match(columpioPattern),
         timeoutTobogan = parseInt(process.env.TIMEOUT),
-        timeoutColumpio = parseInt(15),
+        timeoutColumpio = parseInt(process.env.TIMEOUT_COLUMPIO),
         zascaVerbose = process.env.SAY,
         mozo = tags.username;
     if(toboganMatches){
