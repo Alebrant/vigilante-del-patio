@@ -38,7 +38,9 @@ let recompensas = [];
  * Chat listener initiation
  */
 
+console.log("Conectando adee");
 adee.connect();
+console.log("Conectando tna");
 tna.connect();
 adee.on('message', (chann, tags, message, self) => {
     let oniPattern = /!oni.*/i,

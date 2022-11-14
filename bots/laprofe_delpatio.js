@@ -30,7 +30,7 @@ require("dotenv").config();
 /**
  * Chat listener initiation
  */
-
+console.log("Conectando profe");
 profeDelPatio.connect();
 profeDelPatio.on('message', (chann, tags, message, self) => {
     let toboganPattern = /!tobogan.*/i,
